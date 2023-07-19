@@ -33,7 +33,7 @@ public class InMemoryItemStorage implements ItemStorage {
 
     @Override
     public ItemDto getItemById(long itemId, long userId) {
-        if(!items.containsKey(itemId)) {
+        if (!items.containsKey(itemId)) {
             throw new ResourceNotFoundException("Item with this id not exist");
         }
         return ItemMapper.toItemDto(items.get(itemId));

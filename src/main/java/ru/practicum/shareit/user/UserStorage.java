@@ -8,8 +8,12 @@ import java.util.List;
 public interface UserStorage {
 
     UserDto getUserById(long id);
+
     List<UserDto> getAllUsers();
+
     UserDto createUser(User user);
+
     UserDto updateUser(long userId, User user);
+
     void deleteUserById(long id);
 }

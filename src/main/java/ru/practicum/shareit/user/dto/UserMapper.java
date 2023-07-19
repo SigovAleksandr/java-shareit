@@ -1,6 +1,5 @@
 package ru.practicum.shareit.user.dto;
 
-import org.springframework.ui.ModelMap;
 import ru.practicum.shareit.user.model.User;
 
 public class UserMapper {

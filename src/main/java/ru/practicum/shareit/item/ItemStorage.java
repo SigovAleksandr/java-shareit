@@ -8,8 +8,12 @@ import java.util.List;
 public interface ItemStorage {
 
     ItemDto getItemById(long itemId, long userId);
+
     List<ItemDto> getItems(long userId);
+
     ItemDto addItem(Item item, long userId);
+
     ItemDto updateItem(long itemId, long userId, Item item);
+
     List<ItemDto> searchItems(long userId, String text);
 }
