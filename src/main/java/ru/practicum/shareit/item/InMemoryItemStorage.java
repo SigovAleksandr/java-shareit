@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.ResourceNotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
@@ -10,15 +9,18 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserStorage;
 import ru.practicum.shareit.user.dto.UserMapper;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryItemStorage implements ItemStorage {
 
-    UserStorage userStorage;
-    private final HashMap<Long, Item> items = new HashMap<>();
+    private final UserStorage userStorage;
+    private final Map<Long, Item> items = new HashMap<>();
     private long id = 0;
 
     private long getId() {
@@ -26,7 +28,6 @@ public class InMemoryItemStorage implements ItemStorage {
         return id;
     }
 
-    @Autowired
     public InMemoryItemStorage(UserStorage userStorage) {
         this.userStorage = userStorage;
     }
@@ -51,27 +52,27 @@ public class InMemoryItemStorage implements ItemStorage {
     }
 
     @Override
-    public ItemDto addItem(Item item, long userId) {
+    public ItemDto addItem(@Valid ItemDto itemDto, long userId) {
         if (userStorage.getUserById(userId) == null) {
             throw new ResourceNotFoundException("User with this id not exist");
         }
-        if (item.getAvailable() == null) {
+        if (itemDto.getAvailable() == null) {
             throw new ValidationException("Parameter available must not be null");
         }
-        if (item.getName() == null || item.getName().isEmpty()) {
+        if (itemDto.getName() == null || itemDto.getName().isEmpty()) {
             throw new ValidationException("Name must not be null or empty");
         }
-        if (item.getDescription() == null || item.getDescription().isEmpty()) {
+        if (itemDto.getDescription() == null || itemDto.getDescription().isEmpty()) {
             throw new ValidationException("Description must not be null or empty");
         }
-        item.setId(getId());
-        item.setOwner(UserMapper.fromUserDto(userStorage.getUserById(userId)));
-        items.put(item.getId(), item);
-        return ItemMapper.toItemDto(item);
+        itemDto.setId(getId());
+        itemDto.setOwner(UserMapper.fromUserDto(userStorage.getUserById(userId)));
+        items.put(itemDto.getId(), ItemMapper.fromItemDto(itemDto));
+        return itemDto;
     }
 
     @Override
-    public ItemDto updateItem(long itemId, long userId, Item item) {
+    public ItemDto updateItem(long itemId, long userId, ItemDto itemDto) {
         if (!items.containsKey(itemId)) {
             throw new ResourceNotFoundException("Item with this id not exist");
         }
@@ -79,28 +80,26 @@ public class InMemoryItemStorage implements ItemStorage {
         if (newItem.getOwner().getId() != userId) {
             throw new ResourceNotFoundException("This userId is not an owner of item");
         }
-        if (item.getName() != null)
-            newItem.setName(item.getName());
-        if (item.getDescription() != null)
-            newItem.setDescription(item.getDescription());
-        if (item.getAvailable() != null)
-            newItem.setAvailable(item.getAvailable());
+        if (itemDto.getName() != null)
+            newItem.setName(itemDto.getName());
+        if (itemDto.getDescription() != null)
+            newItem.setDescription(itemDto.getDescription());
+        if (itemDto.getAvailable() != null)
+            newItem.setAvailable(itemDto.getAvailable());
         items.put(itemId, newItem);
         return ItemMapper.toItemDto(newItem);
     }
 
-    @Override
     public List<ItemDto> searchItems(long userId, String text) {
         List<ItemDto> found = new ArrayList<>();
         if (!text.isBlank() || !text.isEmpty()) {
             String str = text.toLowerCase();
-            for (Item item : items.values()) {
-                if (item.getName().toLowerCase().contains(str)
-                        || item.getDescription().toLowerCase().contains(str)
-                        && item.getAvailable()) {
-                    found.add(ItemMapper.toItemDto(item));
-                }
-            }
+            found = items.values().stream()
+                    .filter(item -> item.getName().toLowerCase().contains(str)
+                            || item.getDescription().toLowerCase().contains(str))
+                    .filter(Item::getAvailable)
+                    .map(ItemMapper::toItemDto)
+                    .collect(Collectors.toList());
         }
         return found;
     }

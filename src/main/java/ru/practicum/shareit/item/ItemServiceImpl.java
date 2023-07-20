@@ -1,16 +1,16 @@
 package ru.practicum.shareit.item;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Item;
 
+import javax.validation.Valid;
 import java.util.List;
 
-@Component
+@Service
 public class ItemServiceImpl implements ItemService {
 
-    ItemStorage itemStorage;
+    private final ItemStorage itemStorage;
 
     @Autowired
     public ItemServiceImpl(ItemStorage itemStorage) {
@@ -28,13 +28,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto addItem(Item item, long userId) {
-        return itemStorage.addItem(item, userId);
+    public ItemDto addItem(@Valid ItemDto itemDto, long userId) {
+        return itemStorage.addItem(itemDto, userId);
     }
 
     @Override
-    public ItemDto updateItem(long itemId, long userId, Item item) {
-        return itemStorage.updateItem(itemId, userId, item);
+    public ItemDto updateItem(long itemId, long userId, ItemDto itemDto) {
+        return itemStorage.updateItem(itemId, userId, itemDto);
     }
 
     @Override

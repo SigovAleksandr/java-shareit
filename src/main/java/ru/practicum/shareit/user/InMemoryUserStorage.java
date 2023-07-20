@@ -8,14 +8,16 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class InMemoryUserStorage implements UserStorage {
 
-    private final HashMap<Long, User> users = new HashMap<>();
+    private final Map<Long, User> users = new HashMap<>();
     private long id = 0;
 
     private long getId() {
@@ -41,34 +43,34 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public UserDto createUser(User user) {
+    public UserDto createUser(@Valid UserDto userDto) {
         for (User usr : users.values()) {
-            if (usr.getEmail().equals(user.getEmail())) {
+            if (usr.getEmail().equals(userDto.getEmail())) {
                 throw new InternalErrorException("User with this email already exist");
             }
         }
-        user.setId(getId());
-        users.put(user.getId(), user);
-        return UserMapper.toUserDto(user);
+        userDto.setId(getId());
+        users.put(userDto.getId(), UserMapper.fromUserDto(userDto));
+        return userDto;
     }
 
     @Override
-    public UserDto updateUser(long userId, User user) {
+    public UserDto updateUser(long userId, UserDto userDto) {
         if (!users.containsKey(userId)) {
             throw new ValidationException("User with this id not exist");
         }
         for (User usr : users.values()) {
-            if (usr.getEmail().equals(user.getEmail())) {
+            if (usr.getEmail().equals(userDto.getEmail())) {
                 if (usr.getId() != userId) {
                     throw new InternalErrorException("User with this email already exist");
                 }
             }
         }
         User newUser = users.get(userId);
-        if (user.getName() != null)
-            newUser.setName(user.getName());
-        if (user.getEmail() != null)
-            newUser.setEmail(user.getEmail());
+        if (userDto.getName() != null)
+            newUser.setName(userDto.getName());
+        if (userDto.getEmail() != null)
+            newUser.setEmail(userDto.getEmail());
         newUser.setId(userId);
         users.put(userId, newUser);
         return UserMapper.toUserDto(newUser);

@@ -1,13 +1,13 @@
 package ru.practicum.shareit.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.User;
 
+import javax.validation.Valid;
 import java.util.List;
 
-@Component
+@Service
 public class UserServiceImpl implements UserService {
 
     private final UserStorage userStorage;
@@ -25,12 +25,12 @@ public class UserServiceImpl implements UserService {
         return userStorage.getUserById(id);
     }
 
-    public UserDto updateUser(long userId, User user) {
-        return userStorage.updateUser(userId, user);
+    public UserDto updateUser(long userId, UserDto userDto) {
+        return userStorage.updateUser(userId, userDto);
     }
 
-    public UserDto createUser(User user) {
-        return userStorage.createUser(user);
+    public UserDto createUser(@Valid UserDto userDto) {
+        return userStorage.createUser(userDto);
     }
 
     public void deleteUserById(long id) {

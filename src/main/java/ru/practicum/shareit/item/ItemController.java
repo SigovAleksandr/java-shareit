@@ -31,14 +31,14 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto addItem(@Valid @RequestBody Item item, @RequestHeader(HEADER) long userId) {
-        return itemService.addItem(item, userId);
+    public ItemDto addItem(@Valid @RequestBody ItemDto itemDto, @RequestHeader(HEADER) long userId) {
+        return itemService.addItem(itemDto, userId);
     }
 
     @PatchMapping("/{itemId}")
     public ItemDto updateItem(@Valid @PathVariable long itemId, @RequestHeader(HEADER) long userId,
-                              @RequestBody Item item) {
-        return itemService.updateItem(itemId, userId, item);
+                              @RequestBody ItemDto itemDto) {
+        return itemService.updateItem(itemId, userId, itemDto);
     }
 
     @GetMapping("/search")
