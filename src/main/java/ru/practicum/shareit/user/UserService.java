@@ -2,20 +2,21 @@ package ru.practicum.shareit.user;
 
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.model.User;
 
-import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public interface UserService {
 
-    UserDto getUserById(long id);
+    Optional<User> getUserById(long id);
 
-    List<UserDto> getAllUsers();
+    List<User> getAllUsers();
 
-    UserDto createUser(@Valid UserDto userDto);
+    User createUser(UserDto userDto);
 
-    UserDto updateUser(long userId, UserDto userDto);
+    User updateUser(long userId, UserDto userDto);
 
     void deleteUserById(long id);
 }
