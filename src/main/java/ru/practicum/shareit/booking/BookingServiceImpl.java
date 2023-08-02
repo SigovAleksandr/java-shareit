@@ -119,7 +119,7 @@ public class BookingServiceImpl implements BookingService {
         if (userRepository.findById(userId).isEmpty()) {
             throw new ResourceNotFoundException("User not found");
         }
-        List<Item> itemList = itemRepository.findItemsByOwnerId(userId);
+        List<Item> itemList = itemRepository.findItemsByOwnerIdOrderByIdAsc(userId);
         List<Booking> bookingList = new ArrayList<>();
         switch (state) {
             case "ALL": {

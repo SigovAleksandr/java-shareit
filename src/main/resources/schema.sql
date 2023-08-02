@@ -54,6 +54,7 @@ CREATE TABLE IF NOT EXISTS comments
     text      VARCHAR(500)                            NOT NULL,
     item_id   BIGINT                                  NOT NULL,
     author_id BIGINT                                  NOT NULL,
+    created   TIMESTAMP WITH TIME ZONE,
     FOREIGN KEY (item_id)
         REFERENCES items (id) ON DELETE CASCADE,
     FOREIGN KEY (author_id)

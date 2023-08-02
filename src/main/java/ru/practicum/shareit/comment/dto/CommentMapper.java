@@ -15,12 +15,13 @@ public class CommentMapper {
         );
     }
 
-//    public static Comment fromCommentDto(CommentDto commentDto) {
-//        return new Comment(
-//                commentDto.getId(),
-//                commentDto.getText(),
-//                commentDto.getItemId(),
-//                commentDto.ge
-//        )
-//    }
+    public static Comment fromCommentDto(CommentAddDto commentAddDto) {
+        return new Comment(
+                0,
+                commentAddDto.getText(),
+                0,
+                null,
+                null
+        );
+    }
 }
