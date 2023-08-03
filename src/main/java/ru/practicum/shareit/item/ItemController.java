@@ -12,12 +12,13 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static ru.practicum.shareit.utils.BaseConstants.HEADER;
+
 @RestController
 @RequestMapping("/items")
 public class ItemController {
 
     private final ItemService itemService;
-    private static final String HEADER = "X-Sharer-User-Id";
 
     @Autowired
     public ItemController(ItemService itemService) {
@@ -36,26 +37,24 @@ public class ItemController {
 
     @PostMapping
     public ItemDto addItem(@Valid @RequestBody ItemDto itemDto, @RequestHeader(HEADER) long userId) {
-        return ItemMapper.toItemDto(itemService.addItem(itemDto, userId));
+        return itemService.addItem(itemDto, userId);
     }
 
     @PatchMapping("/{itemId}")
     public ItemDto updateItem(@Valid @PathVariable long itemId, @RequestHeader(HEADER) long userId,
                               @RequestBody ItemDto itemDto) {
-        return ItemMapper.toItemDto(itemService.updateItem(itemId, userId, itemDto));
+        return itemService.updateItem(itemId, userId, itemDto);
     }
 
     @GetMapping("/search")
     public List<ItemDto> searchItems(@RequestHeader(HEADER) long userId,
                                      @RequestParam("text") String text) {
-        return itemService.searchItems(userId, text).stream()
-                .map(ItemMapper::toItemDto)
-                .collect(Collectors.toList());
+        return itemService.searchItems(userId, text);
     }
 
     @PostMapping("/{itemId}/comment")
     public CommentDto addComment(@RequestBody CommentAddDto comment, @RequestHeader(HEADER) long userId,
                                  @PathVariable long itemId) {
-        return CommentMapper.toCommentDto(itemService.addComment(comment, userId, itemId));
+        return itemService.addComment(comment, userId, itemId);
     }
 }

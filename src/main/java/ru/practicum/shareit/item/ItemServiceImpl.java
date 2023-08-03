@@ -49,7 +49,7 @@ public class ItemServiceImpl implements ItemService {
         List<Booking> nextBookingList = bookingRepository.findNextBooking(itemId);
         ItemDto itemDto = ItemMapper.toItemDto(item);
         itemDto.setComments(findItemComments(itemId));
-        if (item.getOwnerId() != userId) {
+        if (item.getOwner().getId() != userId) {
             return itemDto;
         }
         if (!lastBookingList.isEmpty()) {
@@ -79,7 +79,7 @@ public class ItemServiceImpl implements ItemService {
         boolean isOwner = true;
         List<Booking> bookingList = new ArrayList<>();
         for (Item item : itemList) {
-            if (item.getOwnerId() != userId) {
+            if (item.getOwner().getId() != userId) {
                 isOwner = false;
             }
             bookingList.addAll(bookingRepository.findByItemIdOrderByStartDesc(item.getId()));
@@ -102,7 +102,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item addItem(ItemDto itemDto, long userId) {
+    public ItemDto addItem(ItemDto itemDto, long userId) {
         Item item = ItemMapper.fromItemDto(itemDto);
         if (item.getAvailable() == null) {
             throw new ValidationException("Available must not be null");
@@ -113,18 +113,19 @@ public class ItemServiceImpl implements ItemService {
         if (item.getDescription() == null || item.getDescription().isEmpty()) {
             throw new ValidationException("Description must not be null");
         }
-        if (userRepository.findById(userId).isEmpty()) {
-            throw new ResourceNotFoundException("User not found");
-        }
-        item.setOwnerId(userId);
-        return itemRepository.save(item);
+//        if (userRepository.findById(userId).isEmpty()) {
+//            throw new ResourceNotFoundException("User not found");
+//        }
+        item.setOwner(userRepository.findById(userId).orElseThrow(() ->
+                new ResourceNotFoundException("User not found")));
+        return ItemMapper.toItemDto(itemRepository.save(item));
     }
 
     @Override
-    public Item updateItem(long itemId, long userId, ItemDto itemDto) {
+    public ItemDto updateItem(long itemId, long userId, ItemDto itemDto) {
         Item newItem = itemRepository.findById(itemId).orElseThrow(() ->
                 new ResourceNotFoundException("Item not found"));
-        if (newItem.getOwnerId() != userId) {
+        if (newItem.getOwner().getId() != userId) {
             throw new ResourceNotFoundException("Invalid owner id");
         }
         Item item = ItemMapper.fromItemDto(itemDto);
@@ -137,20 +138,22 @@ public class ItemServiceImpl implements ItemService {
         if (item.getAvailable() != null) {
             newItem.setAvailable(item.getAvailable());
         }
-        return itemRepository.save(newItem);
+        return ItemMapper.toItemDto(itemRepository.save(newItem));
     }
 
     @Override
-    public List<Item> searchItems(long userId, String text) {
+    public List<ItemDto> searchItems(long userId, String text) {
         if (text.isEmpty()) {
             return new ArrayList<>();
         }
         String query = text.toUpperCase();
-        return itemRepository.search(query);
+        return itemRepository.search(query).stream()
+                .map(ItemMapper::toItemDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Comment addComment(CommentAddDto comment, long userId, long itemId) {
+    public CommentDto addComment(CommentAddDto comment, long userId, long itemId) {
         Comment addComment = CommentMapper.fromCommentDto(comment);
         if (comment.getText().isEmpty()) {
             throw new ValidationException("Comment must not be empty");
@@ -166,7 +169,7 @@ public class ItemServiceImpl implements ItemService {
         addComment.setAuthor(userRepository.findById(userId).orElseThrow(() ->
                 new ResourceNotFoundException("User not found")));
         addComment.setCreated(LocalDateTime.now());
-        return commentRepository.save(addComment);
+        return CommentMapper.toCommentDto(commentRepository.save(addComment));
     }
 
     @Override
@@ -176,6 +179,4 @@ public class ItemServiceImpl implements ItemService {
                 .map(CommentMapper::toCommentDto)
                 .collect(Collectors.toList());
     }
-
-
 }

@@ -23,28 +23,22 @@ public class UserController {
 
     @GetMapping("/{id}")
     public UserDto getUserById(@PathVariable("id") long id) {
-        if (userService.getUserById(id).isPresent()) {
-            return UserMapper.toUserDto(userService.getUserById(id).get());
-        } else {
-            throw new ResourceNotFoundException("User not found");
-        }
+        return userService.getUserById(id);
     }
 
     @GetMapping()
     public List<UserDto> getAllUsers() {
-        return userService.getAllUsers().stream()
-                .map(UserMapper::toUserDto)
-                .collect(Collectors.toList());
+        return userService.getAllUsers();
     }
 
     @PatchMapping("/{id}")
     public UserDto updateUser(@RequestBody UserDto userDto, @PathVariable("id") long userId) {
-        return UserMapper.toUserDto(userService.updateUser(userId, userDto));
+        return userService.updateUser(userId, userDto);
     }
 
     @PostMapping()
     public UserDto createUser(@Valid @RequestBody UserDto userDto) {
-        return UserMapper.toUserDto(userService.createUser(userDto));
+        return userService.createUser(userDto);
     }
 
     @DeleteMapping("/{id}")
