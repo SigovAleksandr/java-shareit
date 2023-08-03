@@ -3,7 +3,6 @@ package ru.practicum.shareit.item;
 import ru.practicum.shareit.comment.dto.CommentAddDto;
 import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Item;
 
 import javax.validation.Valid;
 import java.util.List;

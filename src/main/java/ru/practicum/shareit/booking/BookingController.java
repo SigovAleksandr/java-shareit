@@ -3,11 +3,9 @@ package ru.practicum.shareit.booking;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingAddDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.BookingMapper;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static ru.practicum.shareit.utils.BaseConstants.HEADER;
 
