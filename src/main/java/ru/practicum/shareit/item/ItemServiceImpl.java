@@ -76,16 +76,9 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> getItems(long userId) {
         List<Item> itemList = itemRepository.findItemsByOwnerIdOrderByIdAsc(userId);
-        boolean isOwner = true;
         List<Booking> bookingList = new ArrayList<>();
         for (Item item : itemList) {
-            if (item.getOwner().getId() != userId) {
-                isOwner = false;
-            }
             bookingList.addAll(bookingRepository.findByItemIdOrderByStartDesc(item.getId()));
-        }
-        if (!isOwner) {
-            throw new ResourceNotFoundException("User is not an owner of item");
         }
         List<ItemDto> dtoList = itemList.stream()
                 .map(ItemMapper::toItemDto)

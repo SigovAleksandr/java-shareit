@@ -6,27 +6,27 @@ import java.util.ArrayList;
 
 public class ItemMapper {
     public static ItemDto toItemDto(Item item) {
-        return new ItemDto(
-                item.getId(),
-                item.getName(),
-                item.getDescription(),
-                item.getAvailable(),
-                item.getOwner(),
-                item.getRequestId() != null ? item.getRequestId() : null,
-                null,
-                null,
-                new ArrayList<>()
-        );
+        return ItemDto.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .available(item.getAvailable())
+                .owner(item.getOwner())
+                .requestId(item.getRequestId() != null ? item.getRequestId() : null)
+                .lastBooking(null)
+                .nextBooking(null)
+                .comments(new ArrayList<>())
+                .build();
     }
 
     public static Item fromItemDto(ItemDto itemDto) {
-        return new Item(
-                itemDto.getId(),
-                itemDto.getName(),
-                itemDto.getDescription(),
-                itemDto.getAvailable(),
-                itemDto.getOwner(),
-                itemDto.getRequestId() != null ? itemDto.getRequestId() : null
-        );
+        return Item.builder()
+                .id(itemDto.getId())
+                .name(itemDto.getName())
+                .description(itemDto.getDescription())
+                .available(itemDto.getAvailable())
+                .owner(itemDto.getOwner())
+                .requestId(itemDto.getRequestId() != null ? itemDto.getRequestId() : null)
+                .build();
     }
 }
