@@ -2,17 +2,20 @@ package ru.practicum.shareit.item;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.comment.dto.CommentAddDto;
+import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import javax.validation.Valid;
 import java.util.List;
+
+import static ru.practicum.shareit.utils.BaseConstants.HEADER;
 
 @RestController
 @RequestMapping("/items")
 public class ItemController {
 
     private final ItemService itemService;
-    private static final String HEADER = "X-Sharer-User-Id";
 
     @Autowired
     public ItemController(ItemService itemService) {
@@ -44,5 +47,11 @@ public class ItemController {
     public List<ItemDto> searchItems(@RequestHeader(HEADER) long userId,
                                      @RequestParam("text") String text) {
         return itemService.searchItems(userId, text);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addComment(@RequestBody CommentAddDto comment, @RequestHeader(HEADER) long userId,
+                                 @PathVariable long itemId) {
+        return itemService.addComment(comment, userId, itemId);
     }
 }
