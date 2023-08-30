@@ -41,7 +41,7 @@ public class RequestServiceTest {
         ItemRequestAddDto itemRequestAddDto = getItemRequestAddDto();
         ItemRequestDto itemRequestDto =
                 itemRequestService.createRequest(itemRequestAddDto, userOne.getId());
-        assertEquals(itemRequestAddDto.getRequester(), itemRequestDto.getRequester());
+        assertEquals(itemRequestAddDto.getRequester().getId(), itemRequestDto.getRequester().getId());
     }
 
     @Test
@@ -55,7 +55,7 @@ public class RequestServiceTest {
         ItemRequestAddDto itemRequestAddDto = getItemRequestAddDto();
         itemRequestService.createRequest(itemRequestAddDto, userOne.getId());
         ItemRequestDto itemRequestDto = itemRequestService.getRequestById(1, 1);
-        assertEquals(itemRequestAddDto.getRequester(), itemRequestDto.getRequester());
+        assertEquals(itemRequestAddDto.getRequester().getId(), itemRequestDto.getRequester().getId());
     }
 
     @Test

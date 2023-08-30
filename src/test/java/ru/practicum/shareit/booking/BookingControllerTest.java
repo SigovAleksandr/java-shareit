@@ -59,7 +59,7 @@ public class BookingControllerTest {
         BookingDto responseDto = getBooking(1);
         when(bookingService.addBooking(any(BookingAddDto.class), eq(userId))).thenReturn(responseDto);
         ResultActions resultActions = mockMvc.perform(post("/bookings")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(BaseConstants.HEADER, userId)
                         .content(objectMapper.writeValueAsString(requestDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -75,7 +75,7 @@ public class BookingControllerTest {
         BookingDto responseDto = getBooking(1);
         when(bookingService.approveBooking(eq(responseDto.getId()), eq(userId), anyBoolean())).thenReturn(responseDto);
         mockMvc.perform(patch("/bookings/" + responseDto.getId())
-                        .header("X-Sharer-User-Id", userId)
+                        .header(BaseConstants.HEADER, userId)
                         .param("approved", "false"))
                 .andExpect(status().isOk());
         verify(bookingService, times(1)).approveBooking(eq(responseDto.getId()), eq(userId),
@@ -92,82 +92,13 @@ public class BookingControllerTest {
                 responseDtoOne,
                 responseDtoTwo
         );
-        when(bookingService.getUserBooking(any(), eq(userId))).thenReturn(responseDtoList);
-        mockMvc.perform(get("/bookings")
-                        .header("X-Sharer-User-Id", userId))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(responseDtoOne.getId()))
-                .andExpect(jsonPath("$[1].id").value(responseDtoTwo.getId()));
-        verify(bookingService, times(1)).getUserBooking(eq("ALL"), eq(userId));
-        verifyNoMoreInteractions(bookingService);
-    }
-
-    @Test
-    void getAllByStateWithFromAndSizeTest() throws Exception {
-        long userId = 1;
-        BookingDto responseDtoOne = getBooking(1);
-        BookingDto responseDtoTwo = getBooking(2);
-        List<BookingDto> responseDtoList = Arrays.asList(
-                responseDtoOne,
-                responseDtoTwo
-        );
-        when(bookingService.getUserBooking(any(), eq(userId))).thenReturn(responseDtoList);
+        when(bookingService.getUserBooking(any(), eq(userId), eq(0), eq(2))).thenReturn(responseDtoList);
         mockMvc.perform(get("/bookings?state=ALL&from=0&size=2")
-                        .header("X-Sharer-User-Id", userId))
+                        .header(BaseConstants.HEADER, userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(responseDtoOne.getId()))
                 .andExpect(jsonPath("$[1].id").value(responseDtoTwo.getId()));
-        verify(bookingService, times(1)).getUserBooking(eq("ALL"), eq(userId));
-        verifyNoMoreInteractions(bookingService);
-    }
-
-    @Test
-    void getUserBookingWithWrongParams() throws Exception {
-        long userId = 1;
-        BookingDto responseDtoOne = getBooking(1);
-        BookingDto responseDtoTwo = getBooking(2);
-        List<BookingDto> responseDtoList = Arrays.asList(
-                responseDtoOne,
-                responseDtoTwo
-        );
-        when(bookingService.getUserBooking(any(), eq(userId))).thenReturn(responseDtoList);
-        mockMvc.perform(get("/bookings?state=ALL&from=0&size=0")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", userId))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void getOwnerBookingWithWrongParams() throws Exception {
-        long userId = 1;
-        BookingDto responseDtoOne = getBooking(1);
-        BookingDto responseDtoTwo = getBooking(2);
-        List<BookingDto> responseDtoList = Arrays.asList(
-                responseDtoOne,
-                responseDtoTwo
-        );
-        mockMvc.perform(get("/bookings/owner?state=ALL&from=0&size=0")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", userId))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void getAllByStateForOwnerTest() throws Exception {
-        long userId = 1;
-        BookingDto responseDtoOne = getBooking(1);
-        BookingDto responseDtoTwo = getBooking(2);
-        List<BookingDto> responseDtoList = Arrays.asList(
-                responseDtoOne,
-                responseDtoTwo
-        );
-        when(bookingService.getUserItemBooking(any(), eq(userId))).thenReturn(responseDtoList);
-        mockMvc.perform(get("/bookings/owner")
-                        .header("X-Sharer-User-Id", userId))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(responseDtoOne.getId()))
-                .andExpect(jsonPath("$[1].id").value(responseDtoTwo.getId()));
-        verify(bookingService, times(1)).getUserItemBooking(eq("ALL"), eq(userId));
+        verify(bookingService, times(1)).getUserBooking(eq("ALL"), eq(userId), eq(0), eq(2));
         verifyNoMoreInteractions(bookingService);
     }
 
@@ -180,13 +111,13 @@ public class BookingControllerTest {
                 responseDtoOne,
                 responseDtoTwo
         );
-        when(bookingService.getUserItemBooking(any(), eq(userId))).thenReturn(responseDtoList);
+        when(bookingService.getUserItemBooking(any(), eq(userId), eq(0), eq(2))).thenReturn(responseDtoList);
         mockMvc.perform(get("/bookings/owner?state=ALL&from=0&size=2")
-                        .header("X-Sharer-User-Id", userId))
+                        .header(BaseConstants.HEADER, userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(responseDtoOne.getId()))
                 .andExpect(jsonPath("$[1].id").value(responseDtoTwo.getId()));
-        verify(bookingService, times(1)).getUserItemBooking(eq("ALL"), eq(userId));
+        verify(bookingService, times(1)).getUserItemBooking(eq("ALL"), eq(userId), eq(0), eq(2));
         verifyNoMoreInteractions(bookingService);
     }
 

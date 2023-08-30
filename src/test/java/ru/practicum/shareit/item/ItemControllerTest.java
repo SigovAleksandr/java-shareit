@@ -10,6 +10,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.comment.dto.CommentAddDto;
 import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.utils.BaseConstants;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -41,7 +42,7 @@ public class ItemControllerTest {
         ItemDto responseDto = getItemResponseDto(1);
         when(itemService.addItem(any(ItemDto.class), eq(1))).thenReturn(responseDto);
         mockMvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(BaseConstants.HEADER, userId)
                         .content(objectMapper.writeValueAsString(requestDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -57,7 +58,7 @@ public class ItemControllerTest {
         ItemDto responseDto = getItemResponseDto(1);
         when(itemService.getItemById(eq(userId), eq(responseDto.getId()))).thenReturn(responseDto);
         mockMvc.perform(get("/items/" + responseDto.getId())
-                        .header("X-Sharer-User-Id", userId))
+                        .header(BaseConstants.HEADER, userId))
                 .andExpect(status().isOk());
         verify(itemService, times(1)).getItemById(eq(userId), eq(responseDto.getId()));
         verifyNoMoreInteractions(itemService);
@@ -74,7 +75,7 @@ public class ItemControllerTest {
         );
         when(itemService.getItems(eq(userId))).thenReturn(responseDtoList);
         mockMvc.perform(get("/items")
-                        .header("X-Sharer-User-Id", userId))
+                        .header(BaseConstants.HEADER, userId))
                 .andExpect(status().isOk());
         verify(itemService, times(1)).getItems(eq(userId));
         verifyNoMoreInteractions(itemService);
@@ -91,7 +92,7 @@ public class ItemControllerTest {
         );
         when(itemService.searchItems(anyLong(), anyString())).thenReturn(responseDtoList);
         mockMvc.perform(get("/items/search")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(BaseConstants.HEADER, userId)
                         .param("text", "someText"))
                 .andExpect(status().isOk());
         verify(itemService, times(1)).searchItems(anyLong(), eq("someText"));
@@ -106,7 +107,7 @@ public class ItemControllerTest {
         ItemDto responseDto = getItemResponseDto(1);
         when(itemService.updateItem(eq(itemId), eq(userId), any(ItemDto.class))).thenReturn(responseDto);
         mockMvc.perform(patch("/items/" + itemId)
-                        .header("X-Sharer-User-Id", userId)
+                        .header(BaseConstants.HEADER, userId)
                         .content(objectMapper.writeValueAsString(requestDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -128,7 +129,7 @@ public class ItemControllerTest {
                 .build();
         when(itemService.addComment(any(CommentAddDto.class), eq(userId), eq(itemId))).thenReturn(responseDto);
         mockMvc.perform(post("/items/" + itemId + "/comment")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(BaseConstants.HEADER, userId)
                         .content(objectMapper.writeValueAsString(requestDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)

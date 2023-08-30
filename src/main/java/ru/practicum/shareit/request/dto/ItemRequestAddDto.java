@@ -6,6 +6,7 @@ import lombok.Data;
 import ru.practicum.shareit.user.model.User;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Data
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 public class ItemRequestAddDto {
     @NotBlank
+    @Size(max = 500)
     private String description;
     private User requester;
     private LocalDateTime created;

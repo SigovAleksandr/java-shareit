@@ -1,12 +1,14 @@
 package ru.practicum.shareit.request.dto;
 
+import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.request.model.ItemRequest;
 
 import java.time.LocalDateTime;
 
+@UtilityClass
 public class ItemRequestMapper {
 
-    public static ItemRequestDto toItemRequestDto(ItemRequest itemRequest) {
+    public ItemRequestDto toItemRequestDto(ItemRequest itemRequest) {
         return ItemRequestDto.builder()
                 .id(itemRequest.getId())
                 .description(itemRequest.getDescription())
@@ -16,7 +18,7 @@ public class ItemRequestMapper {
                 .build();
     }
 
-    public static ItemRequest fromItemRequestDto(ItemRequestAddDto itemRequestDto) {
+    public ItemRequest fromItemRequestDto(ItemRequestAddDto itemRequestDto) {
         return ItemRequest.builder()
                 .id(0)
                 .description(itemRequestDto.getDescription())

@@ -12,6 +12,7 @@ import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.utils.BaseConstants;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -51,7 +52,7 @@ public class RequestControllerTest {
         when(itemRequestService.createRequest(any(ItemRequestAddDto.class), eq(userId)))
                 .thenReturn(ItemRequestMapper.toItemRequestDto(itemRequest));
         mockMvc.perform(post("/requests")
-                        .header("X-Sharer-User-Id", userId)
+                        .header(BaseConstants.HEADER, userId)
                         .content(objectMapper.writeValueAsString(itemRequestAddDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -73,7 +74,7 @@ public class RequestControllerTest {
         when(itemRequestService.getRequestById(eq(userId), eq(itemRequest.getId())))
                 .thenReturn(ItemRequestMapper.toItemRequestDto(itemRequest));
         mockMvc.perform(get("/requests/" + itemRequest.getId())
-                        .header("X-Sharer-User-Id", userId))
+                        .header(BaseConstants.HEADER, userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(itemRequest.getId()));
         verify(itemRequestService, times(1)).getRequestById(eq(userId), eq(itemRequest.getId()));
@@ -100,7 +101,7 @@ public class RequestControllerTest {
         );
         when(itemRequestService.getRequestsForUser(eq(userId))).thenReturn(responseDtoList);
         mockMvc.perform(get("/requests")
-                        .header("X-Sharer-User-Id", userId))
+                        .header(BaseConstants.HEADER, userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(itemRequestOne.getId()))
                 .andExpect(jsonPath("$[1].id").value(itemRequestTwo.getId()));
@@ -128,7 +129,7 @@ public class RequestControllerTest {
         );
         mockMvc.perform(get("/requests/all")
                         .accept(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", userId))
+                        .header(BaseConstants.HEADER, userId))
                 .andExpect(status().isOk());
     }
 
