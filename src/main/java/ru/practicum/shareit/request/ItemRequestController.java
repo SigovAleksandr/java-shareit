@@ -26,7 +26,7 @@ public class ItemRequestController {
     }
 
     @PostMapping
-    public ItemRequestDto createRequest(@Valid @RequestBody ItemRequestAddDto itemRequestAddDto,
+    public ItemRequestDto createRequest(@RequestBody @Valid ItemRequestAddDto itemRequestAddDto,
                                         @RequestHeader(HEADER) long userId) {
         return itemRequestService.createRequest(itemRequestAddDto, userId);
     }

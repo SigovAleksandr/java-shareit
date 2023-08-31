@@ -49,6 +49,18 @@ public class UserControllerTest {
     }
 
     @Test
+    void addNewUserShouldReturnBadRequest() throws Exception {
+        UserDto userDto = getUserDto(1);
+        userDto.setEmail(null);
+        mockMvc.perform(post("/users")
+                        .content(objectMapper.writeValueAsString(userDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void getByIdSuccessTest() throws Exception {
         UserDto userDto = getUserDto(1);
         when(userService.getUserById(eq(userDto.getId()))).thenReturn(userDto);

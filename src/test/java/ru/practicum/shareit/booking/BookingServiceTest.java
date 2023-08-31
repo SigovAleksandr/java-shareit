@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static ru.practicum.shareit.booking.BookingTimeState.*;
 
 @SpringBootTest(properties = "db.name=test", webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @AutoConfigureTestDatabase
@@ -86,7 +87,7 @@ public class BookingServiceTest {
         itemService.addItem(ItemMapper.toItemDto(item), userOne.getId());
         BookingAddDto bookingAddDto = getAddBookingDto(item.getId());
         bookingService.addBooking(bookingAddDto, userTwo.getId());
-        List<BookingDto> bookings = bookingService.getUserBooking("ALL", 2, 0, 20);
+        List<BookingDto> bookings = bookingService.getUserBooking(ALL, 2, 0, 20);
         assertEquals(1, bookings.size());
     }
 
@@ -101,7 +102,7 @@ public class BookingServiceTest {
         BookingAddDto bookingAddDto = getAddBookingDto(item.getId());
         bookingService.addBooking(bookingAddDto, userTwo.getId());
         Thread.sleep(2000);
-        List<BookingDto> bookings = bookingService.getUserBooking("PAST", 2, 0, 20);
+        List<BookingDto> bookings = bookingService.getUserBooking(PAST, 2, 0, 20);
         assertEquals(1, bookings.size());
     }
 
@@ -117,7 +118,7 @@ public class BookingServiceTest {
         bookingAddDto.setStart(LocalDateTime.now().plusMinutes(1));
         bookingAddDto.setEnd(LocalDateTime.now().plusMinutes(2));
         bookingService.addBooking(bookingAddDto, userTwo.getId());
-        List<BookingDto> bookings = bookingService.getUserBooking("FUTURE", 2, 0, 20);
+        List<BookingDto> bookings = bookingService.getUserBooking(FUTURE, 2, 0, 20);
         assertEquals(1, bookings.size());
     }
 
@@ -134,7 +135,7 @@ public class BookingServiceTest {
         bookingAddDto.setEnd(LocalDateTime.now().plusMinutes(2));
         bookingService.addBooking(bookingAddDto, userTwo.getId());
         Thread.sleep(3000);
-        List<BookingDto> bookings = bookingService.getUserBooking("CURRENT", 2, 0, 20);
+        List<BookingDto> bookings = bookingService.getUserBooking(CURRENT, 2, 0, 20);
         assertEquals(1, bookings.size());
     }
 
@@ -151,7 +152,7 @@ public class BookingServiceTest {
         bookingAddDto.setEnd(LocalDateTime.now().plusMinutes(2));
         bookingService.addBooking(bookingAddDto, userTwo.getId());
         Thread.sleep(3000);
-        List<BookingDto> bookings = bookingService.getUserBooking("WAITING", 2, 0, 20);
+        List<BookingDto> bookings = bookingService.getUserBooking(WAITING, 2, 0, 20);
         assertEquals(1, bookings.size());
     }
 
@@ -167,25 +168,14 @@ public class BookingServiceTest {
         bookingService.addBooking(bookingAddDto, userTwo.getId());
         Thread.sleep(2000);
         bookingService.approveBooking(1, 1, false);
-        List<BookingDto> bookings = bookingService.getUserBooking("REJECTED", 2, 0, 20);
+        List<BookingDto> bookings = bookingService.getUserBooking(REJECTED, 2, 0, 20);
         assertEquals(1, bookings.size());
-    }
-
-    @Test
-    void getIncorrectStateUserBookingTest() {
-        User userOne = getUser(1);
-        userService.createUser(UserMapper.toUserDto(userOne));
-        try {
-            bookingService.getUserBooking("INVALID", 1, 0, 20);
-        } catch (ValidationException e) {
-            assertEquals("Unknown state: UNSUPPORTED_STATUS", e.getMessage());
-        }
     }
 
     @Test
     void getUserBookingUserNotFoundTest() {
         try {
-            bookingService.getUserBooking("INVALID", 1, 0, 20);
+            bookingService.getUserBooking(ALL, 1, 0, 20);
         } catch (ResourceNotFoundException e) {
             assertEquals("User not found", e.getMessage());
         }
@@ -201,7 +191,7 @@ public class BookingServiceTest {
         itemService.addItem(ItemMapper.toItemDto(item), userOne.getId());
         BookingAddDto bookingAddDto = getAddBookingDto(item.getId());
         bookingService.addBooking(bookingAddDto, userTwo.getId());
-        List<BookingDto> bookings = bookingService.getUserItemBooking("ALL", 1, 0, 20);
+        List<BookingDto> bookings = bookingService.getUserItemBooking(ALL, 1, 0, 20);
         assertEquals(1, bookings.size());
     }
 
@@ -216,7 +206,7 @@ public class BookingServiceTest {
         BookingAddDto bookingAddDto = getAddBookingDto(item.getId());
         bookingService.addBooking(bookingAddDto, userTwo.getId());
         Thread.sleep(2000);
-        List<BookingDto> bookings = bookingService.getUserItemBooking("PAST", 1, 0, 20);
+        List<BookingDto> bookings = bookingService.getUserItemBooking(PAST, 1, 0, 20);
         assertEquals(1, bookings.size());
     }
 
@@ -232,7 +222,7 @@ public class BookingServiceTest {
         bookingAddDto.setStart(LocalDateTime.now().plusMinutes(1));
         bookingAddDto.setEnd(LocalDateTime.now().plusMinutes(2));
         bookingService.addBooking(bookingAddDto, userTwo.getId());
-        List<BookingDto> bookings = bookingService.getUserItemBooking("FUTURE", 1, 0, 20);
+        List<BookingDto> bookings = bookingService.getUserItemBooking(FUTURE, 1, 0, 20);
         assertEquals(1, bookings.size());
     }
 
@@ -249,7 +239,7 @@ public class BookingServiceTest {
         bookingAddDto.setEnd(LocalDateTime.now().plusMinutes(2));
         bookingService.addBooking(bookingAddDto, userTwo.getId());
         Thread.sleep(3000);
-        List<BookingDto> bookings = bookingService.getUserItemBooking("CURRENT", 1, 0, 20);
+        List<BookingDto> bookings = bookingService.getUserItemBooking(CURRENT, 1, 0, 20);
         assertEquals(1, bookings.size());
     }
 
@@ -266,7 +256,7 @@ public class BookingServiceTest {
         bookingAddDto.setEnd(LocalDateTime.now().plusMinutes(2));
         bookingService.addBooking(bookingAddDto, userTwo.getId());
         Thread.sleep(3000);
-        List<BookingDto> bookings = bookingService.getUserItemBooking("WAITING", 1, 0, 20);
+        List<BookingDto> bookings = bookingService.getUserItemBooking(WAITING, 1, 0, 20);
         assertEquals(1, bookings.size());
     }
 
@@ -282,7 +272,7 @@ public class BookingServiceTest {
         bookingService.addBooking(bookingAddDto, userTwo.getId());
         Thread.sleep(2000);
         bookingService.approveBooking(1, 1, false);
-        List<BookingDto> bookings = bookingService.getUserItemBooking("REJECTED", 1, 0, 20);
+        List<BookingDto> bookings = bookingService.getUserItemBooking(REJECTED, 1, 0, 20);
         assertEquals(1, bookings.size());
     }
 
@@ -291,7 +281,7 @@ public class BookingServiceTest {
         User userOne = getUser(1);
         userService.createUser(UserMapper.toUserDto(userOne));
         try {
-            bookingService.getUserItemBooking("INVALID", 1, 0, 20);
+            bookingService.getUserItemBooking(ALL, 1, 0, 20);
         } catch (ValidationException e) {
             assertEquals("Unknown state: UNSUPPORTED_STATUS", e.getMessage());
         }
@@ -300,7 +290,7 @@ public class BookingServiceTest {
     @Test
     void getUserItemBookingUserNotFoundTest() {
         try {
-            bookingService.getUserItemBooking("INVALID", 1, 0, 20);
+            bookingService.getUserItemBooking(ALL, 1, 0, 20);
         } catch (ResourceNotFoundException e) {
             assertEquals("User not found", e.getMessage());
         }

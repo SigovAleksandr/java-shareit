@@ -88,57 +88,59 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getUserBooking(String state, long userId, int from, int size) {
+    public List<BookingDto> getUserBooking(BookingTimeState state, long userId, int from, int size) {
         if (userRepository.findById(userId).isEmpty()) {
             throw new ResourceNotFoundException("User not found");
         }
         Pageable pageable = PageRequest.of(from / size, size);
         switch (state) {
-            case "ALL": {
+            case ALL: {
                 Page<Booking> bookings = bookingRepository.findByBookerIdOrderByStartDesc(userId, pageable);
                 return bookings.stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             }
-            case "PAST": {
+            case PAST: {
                 LocalDateTime now = LocalDateTime.now();
                 Page<Booking> bookings = bookingRepository.findByBookerIdAndEndIsBeforeOrderByEndDesc(userId, now, pageable);
                 return bookings.stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             }
-            case "FUTURE": {
+            case FUTURE: {
                 LocalDateTime now = LocalDateTime.now().minusSeconds(3);
                 Page<Booking> bookings = bookingRepository.findByBookerIdAndStartIsAfterOrderByEndDesc(userId, now, pageable);
                 return bookings.stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             }
-            case "CURRENT": {
+            case CURRENT: {
                 LocalDateTime now = LocalDateTime.now();
                 Page<Booking> bookings = bookingRepository.findByBookerIdAndStartBeforeAndEndIsAfterOrderByEndDesc(userId, now, now, pageable);
                 return bookings.stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             }
-            case "WAITING": {
+            case WAITING: {
                 Page<Booking> bookings = bookingRepository.findByBookerIdAndStatusIsOrderByStartDesc(userId, BookingStatus.WAITING, pageable);
                 return bookings.stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             }
-            case "REJECTED": {
+            case REJECTED: {
                 Page<Booking> bookings = bookingRepository.findByBookerIdAndStatusIsOrderByStartDesc(userId, BookingStatus.REJECTED, pageable);
                 return bookings.stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             }
+            default: {
+                throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
+            }
         }
-        throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
     }
 
     @Override
-    public List<BookingDto> getUserItemBooking(String state, long userId, int from, int size) {
+    public List<BookingDto> getUserItemBooking(BookingTimeState state, long userId, int from, int size) {
         if (userRepository.findById(userId).isEmpty()) {
             throw new ResourceNotFoundException("User not found");
         }
@@ -148,13 +150,13 @@ public class BookingServiceImpl implements BookingService {
                 .collect(Collectors.toList());
         Pageable pageable = PageRequest.of(from / size, size);
         switch (state) {
-            case "ALL": {
+            case ALL: {
                 Page<Booking> bookings = bookingRepository.findByItemIdInOrderByStartDesc(itemIds, pageable);
                 return bookings.stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             }
-            case "PAST": {
+            case PAST: {
                 Page<Booking> bookings = bookingRepository.findByItemIdInAndEndIsBeforeOrderByEndDesc(itemIds,
                         LocalDateTime.now(), pageable);
                 return bookings.stream()
@@ -163,36 +165,38 @@ public class BookingServiceImpl implements BookingService {
             }
             // LocalDateTime.now().minusSeconds(3) - было в прошлой итерации ТЗ.
             // Без этого костыля у меня не проходят тесты постман.
-            case "FUTURE": {
+            case FUTURE: {
                 Page<Booking> bookings = bookingRepository.findByItemIdInAndStartIsAfterOrderByEndDesc(itemIds,
                         LocalDateTime.now().minusSeconds(3), pageable);
                 return bookings.stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             }
-            case "CURRENT": {
+            case CURRENT: {
                 Page<Booking> bookings = bookingRepository.findByItemIdInAndStartBeforeAndEndIsAfterOrderByEndDesc(
                         itemIds, LocalDateTime.now(), LocalDateTime.now(), pageable);
                 return bookings.stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             }
-            case "WAITING": {
+            case WAITING: {
                 Page<Booking> bookings = bookingRepository.findByItemIdInAndStatusIsOrderByStartDesc(itemIds, BookingStatus.WAITING,
                         pageable);
                 return bookings.stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             }
-            case "REJECTED": {
+            case REJECTED: {
                 Page<Booking> bookings = bookingRepository.findByItemIdInAndStatusIsOrderByStartDesc(itemIds, BookingStatus.REJECTED,
                         pageable);
                 return bookings.stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             }
+            default: {
+                throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
+            }
         }
-        throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
     }
 }
 

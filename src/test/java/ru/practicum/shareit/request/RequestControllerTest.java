@@ -15,7 +15,6 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.utils.BaseConstants;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -47,7 +46,7 @@ public class RequestControllerTest {
         ItemRequest itemRequest = ItemRequest.builder()
                 .id(1)
                 .description("Test description")
-                .requestor(itemRequestAddDto.getRequester())
+                .requestor(getRequester())
                 .build();
         when(itemRequestService.createRequest(any(ItemRequestAddDto.class), eq(userId)))
                 .thenReturn(ItemRequestMapper.toItemRequestDto(itemRequest));
@@ -69,7 +68,7 @@ public class RequestControllerTest {
         ItemRequest itemRequest = ItemRequest.builder()
                 .id(1)
                 .description("Test description")
-                .requestor(itemRequestAddDto.getRequester())
+                .requestor(getRequester())
                 .build();
         when(itemRequestService.getRequestById(eq(userId), eq(itemRequest.getId())))
                 .thenReturn(ItemRequestMapper.toItemRequestDto(itemRequest));
@@ -88,12 +87,12 @@ public class RequestControllerTest {
         ItemRequest itemRequestOne = ItemRequest.builder()
                 .id(1)
                 .description("Test description")
-                .requestor(itemRequestAddDto.getRequester())
+                .requestor(getRequester())
                 .build();
         ItemRequest itemRequestTwo = ItemRequest.builder()
                 .id(2)
                 .description("Test description")
-                .requestor(itemRequestAddDto.getRequester())
+                .requestor(getRequester())
                 .build();
         List<ItemRequestDto> responseDtoList = Arrays.asList(
                 ItemRequestMapper.toItemRequestDto(itemRequestOne),
@@ -116,12 +115,12 @@ public class RequestControllerTest {
         ItemRequest itemRequestOne = ItemRequest.builder()
                 .id(1)
                 .description("Test description")
-                .requestor(itemRequestAddDto.getRequester())
+                .requestor(getRequester())
                 .build();
         ItemRequest itemRequestTwo = ItemRequest.builder()
                 .id(2)
                 .description("Test description")
-                .requestor(itemRequestAddDto.getRequester())
+                .requestor(getRequester())
                 .build();
         List<ItemRequestDto> responseDtoList = Arrays.asList(
                 ItemRequestMapper.toItemRequestDto(itemRequestOne),
@@ -134,16 +133,16 @@ public class RequestControllerTest {
     }
 
     private ItemRequestAddDto getRequest() {
-        User user = User.builder()
+        return ItemRequestAddDto.builder()
+                .description("Test description")
+                .build();
+    }
+
+    private User getRequester() {
+        return User.builder()
                 .id(1)
                 .name("Testname")
                 .email("email@test.ru")
                 .build();
-        return ItemRequestAddDto.builder()
-                .description("Test description")
-                .requester(user)
-                .created(LocalDateTime.now().minusSeconds(1))
-                .build()
-                ;
     }
 }

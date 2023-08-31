@@ -5,7 +5,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ResourceNotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.dto.ItemRequestAddDto;
@@ -16,16 +15,17 @@ import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 public class ItemRequestServiceImpl implements ItemRequestService {
 
-    UserRepository userRepository;
-    ItemRepository itemRepository;
-    ItemRequestRepository itemRequestRepository;
+    private final UserRepository userRepository;
+    private final ItemRepository itemRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     public ItemRequestServiceImpl(UserRepository userRepository,
                                   ItemRepository itemRepository,
@@ -80,22 +80,20 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public List<ItemRequestDto> getAllRequests(long userId) {
         User requester = userRepository.findById(userId).orElseThrow(() ->
                 new ResourceNotFoundException("User not found"));
-        List<ItemRequest> requestList = itemRequestRepository.findAll();
-        if (isRequester(requestList, userId)) {
-            return new ArrayList<>();
+        List<ItemRequest> requestList = itemRequestRepository.findByRequestorIdOrderByCreatedDesc(userId);
+        if (!isRequester(requestList, userId)) {
+            return Collections.emptyList();
         }
         List<Long> requestIds = requestList.stream()
                 .map(ItemRequest::getId)
                 .collect(Collectors.toList());
-        List<Item> items = itemRepository.findByRequestIdIn(requestIds);
+        Map<Long, List<Item>> itemsMap = itemRepository.findByRequestIdIn(requestIds).stream()
+                .collect(Collectors.groupingBy(Item::getRequestId));
         List<ItemRequestDto> requestDtoList = requestList.stream()
-                .sorted(Comparator.comparing(ItemRequest::getCreated).reversed())
                 .map(ItemRequestMapper::toItemRequestDto)
                 .collect(Collectors.toList());
         for (ItemRequestDto requestDto : requestDtoList) {
-            List<Item> requestItems = items.stream()
-                    .filter(item -> item.getRequestId() == requestDto.getId())
-                    .collect(Collectors.toList());
+            List<Item> requestItems = itemsMap.getOrDefault(requestDto.getId(), new ArrayList<>());
             requestDto.setItems(requestItems);
         }
         return requestDtoList;
@@ -103,15 +101,12 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public List<ItemRequestDto> getAllRequestsParametrized(long userId, long from, long size) {
-        if (from < 0 || size <= 0) {
-            throw new ValidationException("Incorrect request params");
-        }
         User requester = userRepository.findById(userId).orElseThrow(() ->
                 new ResourceNotFoundException("User not found"));
         PageRequest pageable = PageRequest.of((int) Math.floor(from / size), (int) size, Sort.by("created").descending());
-        Page<ItemRequest> requestPage = itemRequestRepository.findAll(pageable);
+        Page<ItemRequest> requestPage = itemRequestRepository.findByRequesterOrOwner(userId, pageable);
         if (isRequester(requestPage.getContent(), userId)) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
         List<ItemRequestDto> requestDtoList = requestPage.stream()
                 .map(ItemRequestMapper::toItemRequestDto)
@@ -119,11 +114,10 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         List<Long> requestIds = requestDtoList.stream()
                 .map(ItemRequestDto::getId)
                 .collect(Collectors.toList());
-        List<Item> items = itemRepository.findByRequestIdIn(requestIds);
+        Map<Long, List<Item>> itemsMap = itemRepository.findByRequestIdIn(requestIds).stream()
+                .collect(Collectors.groupingBy(Item::getRequestId));
         for (ItemRequestDto requestDto : requestDtoList) {
-            List<Item> requestItems = items.stream()
-                    .filter(item -> item.getRequestId() == requestDto.getId())
-                    .collect(Collectors.toList());
+            List<Item> requestItems = itemsMap.getOrDefault(requestDto.getId(), new ArrayList<>());
             requestDto.setItems(requestItems);
         }
         return requestDtoList;

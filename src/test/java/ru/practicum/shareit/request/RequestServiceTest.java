@@ -15,7 +15,6 @@ import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,7 +40,7 @@ public class RequestServiceTest {
         ItemRequestAddDto itemRequestAddDto = getItemRequestAddDto();
         ItemRequestDto itemRequestDto =
                 itemRequestService.createRequest(itemRequestAddDto, userOne.getId());
-        assertEquals(itemRequestAddDto.getRequester().getId(), itemRequestDto.getRequester().getId());
+        assertEquals(itemRequestAddDto.getDescription(), itemRequestDto.getDescription());
     }
 
     @Test
@@ -55,7 +54,7 @@ public class RequestServiceTest {
         ItemRequestAddDto itemRequestAddDto = getItemRequestAddDto();
         itemRequestService.createRequest(itemRequestAddDto, userOne.getId());
         ItemRequestDto itemRequestDto = itemRequestService.getRequestById(1, 1);
-        assertEquals(itemRequestAddDto.getRequester().getId(), itemRequestDto.getRequester().getId());
+        assertEquals(itemRequestAddDto.getDescription(), itemRequestDto.getDescription());
     }
 
     @Test
@@ -82,29 +81,33 @@ public class RequestServiceTest {
         itemService.addItem(ItemMapper.toItemDto(item), userTwo.getId());
         ItemRequestAddDto itemRequestAddDto = getItemRequestAddDto();
         itemRequestService.createRequest(itemRequestAddDto, userOne.getId());
-        List<ItemRequestDto> itemRequestDto = itemRequestService.getAllRequests(2);
+        item.setRequestId(1L);
+        itemService.updateItem(item.getId(), userTwo.getId(), ItemMapper.toItemDto(item));
+        List<ItemRequestDto> itemRequestDto = itemRequestService.getAllRequests(1);
         assertEquals(1, itemRequestDto.size());
     }
 
     @Test
-    void getAllRequestsParametrizedSuccessTest() {
+    void getAllRequestsParametrizedEmptySuccessTest() {
         User userOne = getUser(1);
         User userTwo = getUser(2);
+        User userThree = getUser(3);
         Item item = getItem(1);
         userService.createUser(UserMapper.toUserDto(userOne));
         userService.createUser(UserMapper.toUserDto(userTwo));
+        userService.createUser(UserMapper.toUserDto(userThree));
         itemService.addItem(ItemMapper.toItemDto(item), userTwo.getId());
         ItemRequestAddDto itemRequestAddDto = getItemRequestAddDto();
         itemRequestService.createRequest(itemRequestAddDto, userOne.getId());
-        List<ItemRequestDto> itemRequestDto = itemRequestService.getAllRequestsParametrized(2, 0, 1);
-        assertEquals(1, itemRequestDto.size());
+        item.setRequestId(1L);
+        itemService.updateItem(item.getId(), userTwo.getId(), ItemMapper.toItemDto(item));
+        List<ItemRequestDto> itemRequestDto = itemRequestService.getAllRequestsParametrized(3, 0, 20);
+        assertEquals(0, itemRequestDto.size());
     }
 
     private ItemRequestAddDto getItemRequestAddDto() {
         return ItemRequestAddDto.builder()
                 .description("test")
-                .requester(getUser(1))
-                .created(LocalDateTime.now().plusSeconds(1))
                 .build();
     }
 

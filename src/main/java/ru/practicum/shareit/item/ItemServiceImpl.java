@@ -106,9 +106,6 @@ public class ItemServiceImpl implements ItemService {
         if (item.getDescription() == null || item.getDescription().isEmpty()) {
             throw new ValidationException("Description must not be null");
         }
-//        if (userRepository.findById(userId).isEmpty()) {
-//            throw new ResourceNotFoundException("User not found");
-//        }
         item.setOwner(userRepository.findById(userId).orElseThrow(() ->
                 new ResourceNotFoundException("User not found")));
         return ItemMapper.toItemDto(itemRepository.save(item));

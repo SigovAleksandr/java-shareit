@@ -98,7 +98,7 @@ public class BookingControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(responseDtoOne.getId()))
                 .andExpect(jsonPath("$[1].id").value(responseDtoTwo.getId()));
-        verify(bookingService, times(1)).getUserBooking(eq("ALL"), eq(userId), eq(0), eq(2));
+        verify(bookingService, times(1)).getUserBooking(eq(BookingTimeState.ALL), eq(userId), eq(0), eq(2));
         verifyNoMoreInteractions(bookingService);
     }
 
@@ -117,7 +117,7 @@ public class BookingControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(responseDtoOne.getId()))
                 .andExpect(jsonPath("$[1].id").value(responseDtoTwo.getId()));
-        verify(bookingService, times(1)).getUserItemBooking(eq("ALL"), eq(userId), eq(0), eq(2));
+        verify(bookingService, times(1)).getUserItemBooking(eq(BookingTimeState.ALL), eq(userId), eq(0), eq(2));
         verifyNoMoreInteractions(bookingService);
     }
 
