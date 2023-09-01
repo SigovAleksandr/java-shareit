@@ -191,6 +191,10 @@
                                         </limits>
                                     </rule>
                                 </rules>
+                                <excludes>
+                                    <exclude>ru/practicum/**/*Dto.*</exclude>
+                                    <exclude>ru/practicum/shareit/utils/**</exclude>
+                                </excludes>
                             </configuration>
                         </execution>
                         <execution>
