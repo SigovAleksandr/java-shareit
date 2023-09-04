@@ -46,4 +46,21 @@ public class BookingController {
         log.info("Get booking {}, userId={}", bookingId, userId);
         return bookingClient.getBooking(userId, bookingId);
     }
+
+    @PatchMapping("/{bookingId}")
+    public ResponseEntity<Object> approveBooking(@RequestHeader(HEADER) long userId,
+                                                 @PathVariable Long bookingId,
+                                                 @RequestParam("approved") boolean approve) {
+        return bookingClient.approveBooking(bookingId, userId, approve);
+    }
+
+    @GetMapping("/owner")
+    public ResponseEntity<Object> getBookingsForUser(@RequestHeader(HEADER) long userId,
+                                                     @RequestParam(name = "state", defaultValue = "all") String stateParam,
+                                                     @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                                     @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        BookingState state = BookingState.from(stateParam)
+                .orElseThrow(() -> new IllegalArgumentException("Unknown state: UNSUPPORTED_STATUS"));
+        return bookingClient.getBookingsForUser(userId, state, from, size);
+    }
 }
