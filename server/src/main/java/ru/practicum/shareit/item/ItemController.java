@@ -6,7 +6,6 @@ import ru.practicum.shareit.comment.dto.CommentAddDto;
 import ru.practicum.shareit.comment.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 
-import javax.validation.Valid;
 import java.util.List;
 
 import static ru.practicum.shareit.utils.BaseConstants.HEADER;
@@ -33,12 +32,12 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto addItem(@Valid @RequestBody ItemDto itemDto, @RequestHeader(HEADER) long userId) {
+    public ItemDto addItem(@RequestBody ItemDto itemDto, @RequestHeader(HEADER) long userId) {
         return itemService.addItem(itemDto, userId);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@Valid @PathVariable long itemId, @RequestHeader(HEADER) long userId,
+    public ItemDto updateItem(@PathVariable long itemId, @RequestHeader(HEADER) long userId,
                               @RequestBody ItemDto itemDto) {
         return itemService.updateItem(itemId, userId, itemDto);
     }

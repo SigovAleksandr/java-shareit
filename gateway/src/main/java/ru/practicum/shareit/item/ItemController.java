@@ -21,7 +21,7 @@ import javax.validation.constraints.PositiveOrZero;
 public class ItemController {
 
     private final ItemClient itemClient;
-    static final String HEADER = "X-Sharer-User-Id";
+    private static final String HEADER = "X-Sharer-User-Id";
 
     @PostMapping
     public ResponseEntity<Object> addItem(@RequestHeader(HEADER) long userId,
